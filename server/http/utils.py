@@ -16,3 +16,11 @@ def parse_http_req(req: str):
     method, path, version = start_line.split(' ', 2)
     headers_dict = dict([tuple(h.split(": ", 1)) for h in headers.split("\r\n")])
     return HttpRequest(method, path, version, headers_dict, body)
+
+
+def interpret(code):
+    parsed = json.loads(code)
+    stmt = parsed.get('stmt')
+    exec(stmt)
+    expr = parsed.get('expr')
+    return eval(expr)

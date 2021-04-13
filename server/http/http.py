@@ -1,10 +1,9 @@
 import socket
 import asyncio
-import functools
 import logging
 from email.utils import formatdate
 from .const import reason_phrase
-from .utils import parse_http_req, HttpRequest
+from .utils import parse_http_req, HttpRequest, interpret
 
 
 class HttpReqHandler:
@@ -21,11 +20,20 @@ class HttpReqHandler:
             .compile()
 
     def __on_post(self):
-        pass
+        result = interpret(self.request.body)
+        return HttpRespBuilder(200) \
+            .add_header('Server', 'ProChat') \
+            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Access-Control-Allow-Origin', '*') \
+            .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
+            .add_to_body(f"<html><body>The result is {str(result)}</body></html>") \
+            .compile()
 
     def handle(self):
         if self.request.method == 'GET':
             return self.__on_get()
+        if self.request.method == 'POST':
+            return self.__on_post()
         return HttpRespBuilder(501).compile()
 
 
