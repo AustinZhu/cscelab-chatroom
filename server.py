@@ -1,4 +1,6 @@
-import server
+import asyncio
+
+from server import HttpServer
 
 if __name__ == '__main__':
-    server.HttpServer.serve()
+    asyncio.run(HttpServer.serve())
