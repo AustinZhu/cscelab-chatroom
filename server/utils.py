@@ -1,7 +1,7 @@
 import ast
 import logging
 
-from server.http.const import reason_phrase
+from const import reason_phrase
 
 
 class HttpRequest:

@@ -2,7 +2,7 @@ import asyncio
 import logging
 import socket
 
-from .router import Router
+from router import Router
 
 
 class Session:
@@ -31,3 +31,6 @@ class HttpServer:
             c_conn, c_addr = await loop.sock_accept(http_socket)
             session = Session(c_conn, c_addr)
             loop.create_task(router.resolve(session))
+
+if __name__ == '__main__':
+    asyncio.run(HttpServer.serve())
