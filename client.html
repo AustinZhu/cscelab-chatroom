@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prochat</title>
+
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  let topic;
+
+  function addTopic() {
+    const xhttp = new XMLHttpRequest();
+    const name = document.getElementById("topic-name").value;
+    xhttp.onload = function () {
+      window.alert("Created topic room: " + name);
+    };
+    xhttp.open("POST", "http://localhost:8080/topics");
+    xhttp.send("/" + name);
+  }
+
+  $(document).ready(function () {
+    $("#get").click(function () {
+      $.ajax({
+        url: "http://localhost:8080/topics",
+        type: "GET",
+        success: function (resp1) {
+          $("#topic-list").text(resp1);
+        },
+      });
+    });
+    const poll = function poll() {
+      $.ajax({
+        url: "http://localhost:8080/" + topic,
+        type: "GET",
+        success: function (resp) {
+          if (resp !== "") {
+            document.getElementById("messages").innerText += resp + "\n";
+          }
+        },
+        complete: setTimeout(poll, 1000),
+        timeout: 30000,
+      });
+    };
+    $("#sub").click(function () {
+      topic = $("#enter-topic").val();
+      $.post("http://localhost:8080/" + topic, "\"⚠SOMEONE JUST ENTERED THIS ROOM⚠\"")
+      poll();
+    });
+    $("#send").click(function () {
+      $.ajax({
+        url: "http://localhost:8080/" + topic,
+        type: "POST",
+        data: $("#msg").val(),
+        success: function (resp) {
+          $("#list").text(resp);
+        },
+      });
+    });
+  });
+</script>
+<style type="text/css">
+#msg {
+	height: 100px;
+}
+</style>
+<body>
+<h2>ProChat</h2>
+
+<div>
+    <label for="topic-name"></label><input id="topic-name">
+    <button id="add" type="button" onclick="addTopic()">Add Topic</button>
+</div>
+<br>
+<div id="get-list">
+    <button id="get" type="button">Get All Topics</button>
+</div>
+<h3>Topic list</h3>
+<div id="topic-list"><br>
+</div>
+<br>
+<div id="enter">
+    <label for="enter-topic"></label><input id="enter-topic">
+    <button id="sub" type="button">Subscribe Topic</button>
+</div>
+
+<div>
+    <h3>Messages</h3>
+    <p id="messages" style="white-space: pre-line"></p>
+</div>
+
+<div id>
+    <textarea id="msg"  cols="70"></textarea>
+    <button id="send" type="button">Send Message</button>
+</div>
+
+</body>
+</html>
