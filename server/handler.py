@@ -13,31 +13,31 @@ class TopicHandler:
         self.topics[path] = MessageHandler(path)
         return HttpRespBuilder(200) \
             .add_header('Server', 'ProChat') \
-            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Content-Type', 'text/plain; charset=utf-8') \
             .add_header('Access-Control-Allow-Origin', '*') \
             .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
-            .add_to_body(f"<html><body>Created topic: {path}</body></html>") \
+            .add_to_body(path) \
             .compile()
 
     def __on_delete(self, path: str):
         return HttpRespBuilder(200) \
             .add_header('Server', 'ProChat') \
-            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Content-Type', 'text/plain; charset=utf-8') \
             .add_header('Access-Control-Allow-Origin', '*') \
             .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
-            .add_to_body(f"<html><body>Deleted topic: {path}</body></html>") \
+            .add_to_body(path) \
             .compile()
 
     def __on_get(self):
         topics = ""
         for k in self.topics.keys():
-            topics += k + ", "
+            topics += k + " "
         return HttpRespBuilder(200) \
             .add_header('Server', 'ProChat') \
-            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Content-Type', 'text/plain; charset=utf-8') \
             .add_header('Access-Control-Allow-Origin', '*') \
             .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
-            .add_to_body(f"<html><body>Topics:<br>{topics}</body></html>") \
+            .add_to_body(topics) \
             .compile()
 
     def handle(self, req: HttpRequest):
@@ -57,13 +57,15 @@ class MessageHandler:
 
     @logger
     def __on_get(self):
-        msg = self.msg_queue.pop(0)
+        msg = ""
+        if self.msg_queue:
+            msg = self.msg_queue.pop(0)
         return HttpRespBuilder(200) \
             .add_header('Server', 'ProChat') \
-            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Content-Type', 'text/plain; charset=utf-8') \
             .add_header('Access-Control-Allow-Origin', '*') \
             .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
-            .add_to_body(f"<html><body>{msg}</body></html>") \
+            .add_to_body(msg) \
             .compile()
 
     @logger
@@ -72,10 +74,10 @@ class MessageHandler:
         self.msg_queue.append(result)
         return HttpRespBuilder(200) \
             .add_header('Server', 'ProChat') \
-            .add_header('Content-Type', 'text/html; charset=utf-8') \
+            .add_header('Content-Type', 'text/plain; charset=utf-8') \
             .add_header('Access-Control-Allow-Origin', '*') \
             .add_header('Date', formatdate(timeval=None, localtime=False, usegmt=True)) \
-            .add_to_body(f"<html><body>Your message is:<br>{str(result)}</body></html>") \
+            .add_to_body(str(result)) \
             .compile()
 
     def handle(self, req: HttpRequest):
